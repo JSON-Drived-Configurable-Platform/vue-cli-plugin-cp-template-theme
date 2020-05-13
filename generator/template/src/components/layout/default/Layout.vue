@@ -27,8 +27,6 @@
 <script>
 import appHeader from "./components/header/appHeader";
 import Breadcrumb from "./components/breadcrumb/Breadcrumb";
-import config from "../../../config";
-import { computeBreadCrumbList } from "../../../libs/utils";
 import appSlider from "./components/slider/appSlider";
 
 export default {
@@ -39,7 +37,8 @@ export default {
   },
   data() {
     return {
-      isCollapsed: false
+      isCollapsed: false,
+      defaultOpenNames: ''
     };
   },
 
@@ -53,11 +52,11 @@ export default {
     },
 
     breadcrumb() {
-      return computeBreadCrumbList(this.pagePath, this.menuList);
+      return this.computeBreadCrumbList(this.pagePath, this.menuList);
     },
 
     openNames() {
-      return config.defaultOpenNames ? [config.defaultOpenNames] : [];
+      return this.defaultOpenNames ? [this.defaultOpenNames] : [];
     }
   },
 
@@ -69,6 +68,23 @@ export default {
     },
     changeMenu() {
       this.$refs.menuSide.toggleCollapse();
+    },
+    computeBreadCrumbList(currentPath = "", menuList = []) {
+      let breadCrumbList = [];
+      menuList.forEach(item => {
+        if (item.submenu) {
+          item.submenu.forEach(subItem => {
+            if (currentPath === subItem.path) {
+              breadCrumbList.push(item.label, subItem.label);
+            }
+          });
+        } else {
+          if (currentPath === item.path) {
+            breadCrumbList.push(item.label);
+          }
+        }
+      });
+      return breadCrumbList;
     }
   }
 };
